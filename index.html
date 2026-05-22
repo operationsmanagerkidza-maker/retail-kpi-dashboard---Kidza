@@ -1833,49 +1833,20 @@ function handleFileUpload(event, type) {
   showLoading(`Parsing ${file.name}...`);
   Papa.parse(file, {
     header: true, skipEmptyLines: true,
-     complete: (result) => {
-  
-    hideLoading();
-  
-    if (type === 'TY') {
-  
-      rawData = result.data;
-  
-      // IMPORTANT FIX
-      window.salesData = rawData;
-  
-      // SAVE DATA
-      localStorage.setItem(
-        'salesData',
-        JSON.stringify(rawData)
-      );
-  
-      // PROCESS DATA
-      postProcessData();
-  
-      // RENDER DASHBOARD
-      renderDashboard();
-  
-      document.getElementById('tyStatus')
-      .textContent =
-      `✅ Loaded ${rawData.length} rows from ${file.name}`;
-  
-    }
-  
-    else if (type === 'LY') {
-  
-      parseLYCSV(result.data);
-  
-      localStorage.setItem(
-        'lyData',
-        JSON.stringify(result.data)
-      );
-  
-      document.getElementById('lyStatus')
-      .textContent =
-      `✅ LY data loaded from ${file.name}`;
-    }
-  },
+    complete: (result) => {
+      hideLoading();
+      if (type === 'TY') {
+        rawData = result.data;
+        postProcessData();
+        document.getElementById('tyStatus').textContent = `✅ Loaded ${rawData.length} rows from ${file.name}`;
+      } else if (type === 'LY') {
+        parseLYCSV(result.data);
+        document.getElementById('lyStatus').textContent = `✅ LY data loaded from ${file.name}`;
+      }
+    },
+    error: (e) => { hideLoading(); alert('Parse error: '+e.message); }
+  });
+}
 
 function handleDrop(event, type) {
   event.preventDefault();
@@ -2051,47 +2022,6 @@ function init() {
       <div class="action-title">Getting Started</div>
       <div class="action-body">1. Go to <strong>Data Upload</strong> → upload current year sales CSV<br>2. Paste last year monthly data in the LY section<br>3. Set square feet per store in <strong>Settings</strong><br>4. Return here for full KPI analysis</div>
     </div>`;
-}
-  function renderDashboard(){
-
-  if(
-    !window.salesData ||
-    window.salesData.length === 0
-  ){
-    alert("No data loaded");
-    return;
-  }
-
-  console.log(
-    "Dashboard Loaded:",
-    window.salesData.length
-  );
-
-  // Refresh KPI cards
-  updateKPICards();
-
-  // Refresh charts
-  renderCharts();
-
-  // Refresh tables
-  renderTables();
-}
-  window.onload = function(){
-
-  const savedData =
-  localStorage.getItem('salesData');
-
-  if(savedData){
-
-    window.salesData =
-    JSON.parse(savedData);
-
-    rawData = window.salesData;
-
-    postProcessData();
-
-    renderDashboard();
-  }
 }
 
 init();
