@@ -1833,20 +1833,49 @@ function handleFileUpload(event, type) {
   showLoading(`Parsing ${file.name}...`);
   Papa.parse(file, {
     header: true, skipEmptyLines: true,
-    complete: (result) => {
-      hideLoading();
-      if (type === 'TY') {
-        rawData = result.data;
-        postProcessData();
-        document.getElementById('tyStatus').textContent = `✅ Loaded ${rawData.length} rows from ${file.name}`;
-      } else if (type === 'LY') {
-        parseLYCSV(result.data);
-        document.getElementById('lyStatus').textContent = `✅ LY data loaded from ${file.name}`;
-      }
-    },
-    error: (e) => { hideLoading(); alert('Parse error: '+e.message); }
-  });
-}
+     complete: (result) => {
+  
+    hideLoading();
+  
+    if (type === 'TY') {
+  
+      rawData = result.data;
+  
+      // IMPORTANT FIX
+      window.salesData = rawData;
+  
+      // SAVE DATA
+      localStorage.setItem(
+        'salesData',
+        JSON.stringify(rawData)
+      );
+  
+      // PROCESS DATA
+      postProcessData();
+  
+      // RENDER DASHBOARD
+      renderDashboard();
+  
+      document.getElementById('tyStatus')
+      .textContent =
+      `✅ Loaded ${rawData.length} rows from ${file.name}`;
+  
+    }
+  
+    else if (type === 'LY') {
+  
+      parseLYCSV(result.data);
+  
+      localStorage.setItem(
+        'lyData',
+        JSON.stringify(result.data)
+      );
+  
+      document.getElementById('lyStatus')
+      .textContent =
+      `✅ LY data loaded from ${file.name}`;
+    }
+  },
 
 function handleDrop(event, type) {
   event.preventDefault();
