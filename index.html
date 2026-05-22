@@ -2052,6 +2052,47 @@ function init() {
       <div class="action-body">1. Go to <strong>Data Upload</strong> → upload current year sales CSV<br>2. Paste last year monthly data in the LY section<br>3. Set square feet per store in <strong>Settings</strong><br>4. Return here for full KPI analysis</div>
     </div>`;
 }
+  function renderDashboard(){
+
+  if(
+    !window.salesData ||
+    window.salesData.length === 0
+  ){
+    alert("No data loaded");
+    return;
+  }
+
+  console.log(
+    "Dashboard Loaded:",
+    window.salesData.length
+  );
+
+  // Refresh KPI cards
+  updateKPICards();
+
+  // Refresh charts
+  renderCharts();
+
+  // Refresh tables
+  renderTables();
+}
+  window.onload = function(){
+
+  const savedData =
+  localStorage.getItem('salesData');
+
+  if(savedData){
+
+    window.salesData =
+    JSON.parse(savedData);
+
+    rawData = window.salesData;
+
+    postProcessData();
+
+    renderDashboard();
+  }
+}
 
 init();
 </script>
